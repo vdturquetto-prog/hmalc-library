@@ -13,7 +13,7 @@
 
 // Set this to your deployed Apps Script Web App URL after you run
 // Deploy > New deployment > Web app in the Apps Script editor.
-export const EXEC_URL = 'PASTE_YOUR_APPS_SCRIPT_WEB_APP_URL_HERE';
+export const EXEC_URL = 'https://script.googleusercontent.com/a/macros/hudsonadulted.org/echo?user_content_key=AUkAhnTab77jUXCLezetGroDJAVCp-1Je-ZCvumm-HhxT3yPvrpqOQyhUFbC343Rb8kwbDUkcJkBYQCyjgFK8WVe9572iviIIFyz7p3dIBTPwomnZiqccGcK3fgKacGmeNIdzYaplXr1ryNwcnigyWT-mHlVEGTayj8R5ADcbnVyvsediIEzg9W8vQZM1gaJi6YWfEaPHviMXSUqEzRs9yZEUOg6-kQJiDdizH4ZKvV6GyICqH7WMtEoOQMHiV6TjzgKDcyrOQAE317pfYxTr2kCLMpndYuu4rTVoKksQgiTsLik3wtFRsY&lib=M1UEbldTuhCfcKYnoFn9pCLHw7bdhDzKy';
 
 const TOKEN_KEY = 'hmalc_token';
 
