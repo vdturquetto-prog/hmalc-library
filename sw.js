@@ -1,11 +1,16 @@
 /**
- * Minimal service worker: cache-first for the app shell so it installs
- * and opens instantly (even offline); everything else (the Apps Script
- * API) goes straight to the network — writes need connectivity anyway,
- * and stale inventory data is more confusing than a clear "you're offline"
- * failure for this small a user base.
+ * Minimal service worker: network-first for the app shell's code
+ * (HTML/CSS/JS) so a deployed fix is never stuck behind a stale cache —
+ * only falls back to the cached copy if the network request fails
+ * (actually offline). Icons rarely change, so those stay cache-first
+ * for faster installs. Apps Script API calls are never cached.
+ *
+ * IMPORTANT: bump CACHE_NAME (v2 -> v3 -> ...) whenever you want to force
+ * every installed copy to drop its old cache immediately, e.g. after a
+ * bug like a stale api.js URL got cached before a fix shipped.
  */
-const CACHE_NAME = 'hmalc-shell-v1';
+const CACHE_NAME = 'hmalc-shell-v2';
+const CACHE_FIRST_FILES = ['./icons/icon-192.png', './icons/icon-512.png'];
 const SHELL_FILES = [
   './',
   './index.html',
@@ -50,10 +55,24 @@ self.addEventListener('fetch', (event) => {
   // Never cache calls to the Apps Script backend — always hit the network.
   if (url.origin !== self.location.origin) return;
 
+  const isCacheFirst = CACHE_FIRST_FILES.some((f) => event.request.url.endsWith(f.replace('./', '')));
+
+  if (isCacheFirst) {
+    event.respondWith(
+      caches.match(event.request).then((cached) => cached || fetch(event.request))
+    );
+    return;
+  }
+
+  // Network-first for HTML/CSS/JS: always get the latest deployed code
+  // when online, and only fall back to the cached shell if truly offline.
   event.respondWith(
-    caches.match(event.request).then((cached) => {
-      if (cached) return cached;
-      return fetch(event.request).catch(() => cached);
-    })
+    fetch(event.request)
+      .then((response) => {
+        const copy = response.clone();
+        caches.open(CACHE_NAME).then((cache) => cache.put(event.request, copy));
+        return response;
+      })
+      .catch(() => caches.match(event.request))
   );
 });
